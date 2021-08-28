@@ -11,7 +11,7 @@ import FriendController from "./controller/FriendController";
 import GroupController from "./controller/GroupController";
 
 createConnection().then(async connection => {
-
+    console.log("app running")
     const app = express();
 
     app.use(function( req, res, next ) {
@@ -39,7 +39,7 @@ createConnection().then(async connection => {
     });
 
     const httpServer = require("http").createServer(app);
-
+    console.log("port : " +process.env.PORT || 3000 )
     httpServer.listen(process.env.PORT || 3000  , () => {
         //BanJob.checkBanUser()
     });
