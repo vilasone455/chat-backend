@@ -1,0 +1,1 @@
+{"version":3,"file":"BadPermissionExpection.js","sourceRoot":"","sources":["../../src/exceptions/BadPermissionExpection.ts"],"names":[],"mappings":";;AAAA,mDAA4C;AAE5C,MAAM,uBAAwB,SAAQ,uBAAa;IACjD;QACE,KAAK,CAAC,GAAG,EAAE,+CAA+C,CAAC,CAAC;IAC9D,CAAC;CACF;AAED,kBAAe,uBAAuB,CAAC"}

@@ -24,11 +24,9 @@ function validationMiddleware<T>(entity : EntityTarget<T> , fieldName : string =
 
                 if(rs){
                     req.user = rs["user"]
-                    if(req.user.isBan){
-                        next(new BanException()) 
-                    }else{
+            
                         next()
-                    }
+                    
                     
                 }else{
                     next(new BadPermissionExpections()) 
