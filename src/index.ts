@@ -1,0 +1,51 @@
+import bodyParser = require("body-parser");
+import express = require("express");
+import "reflect-metadata";
+import './initenv'
+import {createConnection} from "typeorm";
+import ChatController from "./controller/ChatController";
+
+import Controller from "./interfaces/controller.interface";
+import UserController from "./controller/UserController";
+import FriendController from "./controller/FriendController";
+import GroupController from "./controller/GroupController";
+
+createConnection().then(async connection => {
+
+    const app = express();
+
+    app.use(function( req, res, next ) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+        res.header("Access-Control-Allow-Headers", "x-requested-with, content-type , authorization" );
+        res.header("Access-Control-Allow-Credentials", "true");
+        if ('OPTIONS' == req.method) { res.send(200); } else { next(); } 
+    });
+
+
+
+    app.use(bodyParser.json())
+    app.use(bodyParser.urlencoded({extended: true}))
+
+    let controllers : Controller[] = [
+        new UserController,
+        new ChatController(),
+        new FriendController(),
+        new GroupController()
+    ]
+    
+    controllers.forEach((controller) => {
+        app.use('/', controller.router);
+    });
+
+    const httpServer = require("http").createServer(app);
+
+    httpServer.listen(3000 , () => {
+        //BanJob.checkBanUser()
+    });
+  
+    app.on('close', () => {
+        app.removeAllListeners();
+    });
+
+}).catch(error => console.log(error));

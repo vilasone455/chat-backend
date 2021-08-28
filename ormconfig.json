@@ -1,0 +1,20 @@
+{
+   "name": "default",
+   "type": "postgres",
+   "url": "postgres://irgeyngg:9Sq443JR5Gai240XDA5baya_hKXp2KvM@satao.db.elephantsql.com/irgeyngg",
+   "synchronize": true,
+   "entities": [
+      "src/entity/**/*.ts"
+   ],
+   "migrations": [
+      "src/migration/**/*.ts"
+   ],
+   "subscribers": [
+      "src/subscriber/**/*.ts"
+   ],
+   "cli": {
+      "entitiesDir": "src/entity",
+      "migrationsDir": "src/migration",
+      "subscribersDir": "src/subscriber"
+   }
+}
