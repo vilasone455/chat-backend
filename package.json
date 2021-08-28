@@ -20,6 +20,7 @@
       "typeorm": "0.2.37"
    },
    "scripts": {
+      "postinstall": "tsc",
       "start": "ts-node src/index.ts"
    }
 }
