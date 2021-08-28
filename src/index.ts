@@ -40,7 +40,7 @@ createConnection().then(async connection => {
 
     const httpServer = require("http").createServer(app);
 
-    httpServer.listen(3000 , () => {
+    httpServer.listen(process.env.PORT || 3000  , () => {
         //BanJob.checkBanUser()
     });
   
