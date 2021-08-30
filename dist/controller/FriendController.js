@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+const NoficationTb_1 = require("../entity/NoficationTb");
+const RequestStatus_1 = require("../interfaces/RequestStatus");
 const typeorm_1 = require("typeorm");
 const Friend_1 = require("../entity/Friend");
 const FrientRequest_1 = require("../entity/FrientRequest");
@@ -59,14 +61,34 @@ class FriendController {
                 .innerJoinAndSelect("f.follower", "follower")
                 .innerJoinAndSelect("f.following", "following")
                 .where("f.followerId = :id OR f.followingId = :id", { id: user.id }).getMany();
-            response.send(rs);
+            let friends = [];
+            rs.forEach(f => {
+                if (f.follower.id === user.id) {
+                    friends.push(f.following);
+                }
+                if (f.following.id === user.id) {
+                    friends.push(f.follower);
+                }
+            });
+            response.send(friends);
         };
         this.rejectRequest = async (request, response, next) => {
             let id = request.params.id;
             let user = request.user;
             const rs = await this.friendRequestRes.createQueryBuilder("f")
+                .innerJoinAndSelect("f.recipient", "recipient")
+                .innerJoinAndSelect("f.sender", "sender")
                 .where("f.id = :id", { id }).getOne();
             if (rs) {
+                if (rs.recipient.id === user.id) {
+                    rs.status = RequestStatus_1.RequestStatus.Reject;
+                    NoficationTb_1.sendNofication(user, rs.sender, NoficationTb_1.NoficationType.RejectFriendRequest);
+                    const fs = await this.friendRequestRes.save(rs);
+                    return response.send(fs);
+                }
+                else {
+                    return response.status(400).send("Bad Request");
+                }
             }
             else {
                 response.status(404).send("Request Not found");
@@ -86,6 +108,7 @@ class FriendController {
                     f.follower = user;
                     f.following = rs.sender;
                     rs.status = 2;
+                    NoficationTb_1.sendNofication(user, rs.sender, NoficationTb_1.NoficationType.AcceptFriendRequest);
                     await this.friendRequestRes.save(rs);
                     const fs = await friendRes.save(f);
                     return response.send(fs);
@@ -111,6 +134,7 @@ class FriendController {
             response.send(rs);
         };
         this.sendFriendRequest = async (request, response, next) => {
+            let userRes = typeorm_1.getRepository(User_1.User);
             let sender = request.user;
             console.log(sender);
             console.log("send request");
@@ -129,6 +153,10 @@ class FriendController {
                 sender: sender.id,
                 recipient: request.params.id
             };
+            let target = await userRes.findOne(request.params.id);
+            if (!target)
+                return response.status(400).send("User not Exist");
+            NoficationTb_1.sendNofication(sender, target, NoficationTb_1.NoficationType.SendFriendRequest);
             const rs = await this.friendRequestRes.save(newRequest);
             console.log(rs);
             response.send(rs);

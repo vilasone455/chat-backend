@@ -24,9 +24,15 @@ class UserController implements Controller {
 
     private initializeRoutes() {
         this.router.get(`/alluser`, this.allUsers);
- 
+        this.router.put(`/edituser/:id`, this.editUser);
         this.router.post(`/login`, this.login);
         this.router.post(`/register`, this.register);
+    }
+
+    private editUser = async (request: Request, response: Response, next: NextFunction) => {
+        let u : User = request.body
+        const rs = await this.userRes.save(u)
+        response.send(rs)
     }
 
 

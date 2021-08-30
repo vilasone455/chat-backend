@@ -1,4 +1,5 @@
 import { NextFunction, Response, Router } from "express";
+import { NoficationType, sendNofication } from "../entity/NoficationTb";
 import { getRepository } from "typeorm";
 import { Conversation } from "../entity/Conversation";
 import { Group } from "../entity/Group";
@@ -23,6 +24,7 @@ class GroupController{
     }
 
     private initializeRoutes() {
+        this.router.get(`${this.path}/reject/:id`, authMiddleware , this.rejectGroup);
         this.router.get(`${this.path}/accept/:id`, authMiddleware , this.acceptGroup);
         this.router.get(`${this.path}/invite/:userid/:conid`, authMiddleware , this.inviteGroup);
         this.router.post(`${this.path}`, authMiddleware , this.createGroup);
@@ -54,6 +56,17 @@ class GroupController{
         response.send(rs)
     }
 
+    private rejectGroup = async (request: RequestWithUser, response: Response, next: NextFunction) => {
+        let id = request.params.id
+        let rq = await this.groupRequestRes.findOne({where : {id} , relations : ["sender" , "conversation"]})
+        rq.status = RequestStatus.Reject
+        const rs = await this.groupRequestRes.save(rq)
+
+        sendNofication(request.user , rq.sender , NoficationType.RejectGroupRequest)
+
+        response.send(rs)
+    }
+
     private acceptGroup = async (request: RequestWithUser, response: Response, next: NextFunction) => {
         let id = request.params.id
         let rq = await this.groupRequestRes.findOne({where : {id} , relations : ["sender" , "conversation"]})
@@ -63,6 +76,8 @@ class GroupController{
         let mem = new MemberShip()
         mem.user = request.user
         mem.conversation = rq.conversation
+
+        sendNofication(request.user , rq.sender , NoficationType.AcceptGroupRequest)
 
         let rs = await this.memberShipRes.save(mem)
         response.send(rs)
@@ -76,6 +91,7 @@ class GroupController{
         groupRequest.conversation = con
         groupRequest.sender = request.user
         groupRequest.recipient = targetUser
+        sendNofication(request.user , targetUser , NoficationType.SendGroupRequest)
         const rs = await this.groupRequestRes.save(groupRequest)
         response.send(rs)
     }

@@ -8,6 +8,7 @@ declare class GroupController {
     private initializeRoutes;
     private findMyGroup;
     private findGroup;
+    private rejectGroup;
     private acceptGroup;
     private inviteGroup;
     private createGroup;

@@ -9,6 +9,7 @@ import Controller from "./interfaces/controller.interface";
 import UserController from "./controller/UserController";
 import FriendController from "./controller/FriendController";
 import GroupController from "./controller/GroupController";
+import NoficationController from "./controller/NoficationController";
 
 createConnection().then(async connection => {
     console.log("app running")
@@ -31,7 +32,8 @@ createConnection().then(async connection => {
         new UserController,
         new ChatController(),
         new FriendController(),
-        new GroupController()
+        new GroupController(),
+        new NoficationController()
     ]
     
     controllers.forEach((controller) => {

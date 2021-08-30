@@ -9,6 +9,7 @@ const ChatController_1 = require("./controller/ChatController");
 const UserController_1 = require("./controller/UserController");
 const FriendController_1 = require("./controller/FriendController");
 const GroupController_1 = require("./controller/GroupController");
+const NoficationController_1 = require("./controller/NoficationController");
 typeorm_1.createConnection().then(async (connection) => {
     console.log("app running");
     const app = express();
@@ -30,7 +31,8 @@ typeorm_1.createConnection().then(async (connection) => {
         new UserController_1.default,
         new ChatController_1.default(),
         new FriendController_1.default(),
-        new GroupController_1.default()
+        new GroupController_1.default(),
+        new NoficationController_1.default()
     ];
     controllers.forEach((controller) => {
         app.use('/', controller.router);

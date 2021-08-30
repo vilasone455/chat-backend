@@ -5,6 +5,7 @@ declare class UserController implements Controller {
     private userRes;
     constructor();
     private initializeRoutes;
+    private editUser;
     private login;
     private register;
     private allUsers;

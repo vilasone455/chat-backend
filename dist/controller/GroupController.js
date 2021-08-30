@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+const NoficationTb_1 = require("../entity/NoficationTb");
 const typeorm_1 = require("typeorm");
 const Conversation_1 = require("../entity/Conversation");
 const Group_1 = require("../entity/Group");
@@ -38,6 +39,14 @@ class GroupController {
                 .getMany();
             response.send(rs);
         };
+        this.rejectGroup = async (request, response, next) => {
+            let id = request.params.id;
+            let rq = await this.groupRequestRes.findOne({ where: { id }, relations: ["sender", "conversation"] });
+            rq.status = RequestStatus_1.RequestStatus.Reject;
+            const rs = await this.groupRequestRes.save(rq);
+            NoficationTb_1.sendNofication(request.user, rq.sender, NoficationTb_1.NoficationType.RejectGroupRequest);
+            response.send(rs);
+        };
         this.acceptGroup = async (request, response, next) => {
             let id = request.params.id;
             let rq = await this.groupRequestRes.findOne({ where: { id }, relations: ["sender", "conversation"] });
@@ -46,6 +55,7 @@ class GroupController {
             let mem = new MemberShip_1.MemberShip();
             mem.user = request.user;
             mem.conversation = rq.conversation;
+            NoficationTb_1.sendNofication(request.user, rq.sender, NoficationTb_1.NoficationType.AcceptGroupRequest);
             let rs = await this.memberShipRes.save(mem);
             response.send(rs);
         };
@@ -57,6 +67,7 @@ class GroupController {
             groupRequest.conversation = con;
             groupRequest.sender = request.user;
             groupRequest.recipient = targetUser;
+            NoficationTb_1.sendNofication(request.user, targetUser, NoficationTb_1.NoficationType.SendGroupRequest);
             const rs = await this.groupRequestRes.save(groupRequest);
             response.send(rs);
         };
@@ -79,6 +90,7 @@ class GroupController {
         this.initializeRoutes();
     }
     initializeRoutes() {
+        this.router.get(`${this.path}/reject/:id`, auth_middleware_1.default, this.rejectGroup);
         this.router.get(`${this.path}/accept/:id`, auth_middleware_1.default, this.acceptGroup);
         this.router.get(`${this.path}/invite/:userid/:conid`, auth_middleware_1.default, this.inviteGroup);
         this.router.post(`${this.path}`, auth_middleware_1.default, this.createGroup);

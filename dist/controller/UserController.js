@@ -12,6 +12,11 @@ class UserController {
         this.path = '/users';
         this.router = express_1.Router();
         this.userRes = typeorm_1.getRepository(User_1.User);
+        this.editUser = async (request, response, next) => {
+            let u = request.body;
+            const rs = await this.userRes.save(u);
+            response.send(rs);
+        };
         this.login = async (request, response, next) => {
             const logInData = request.body;
             const user = await this.userRes.findOne({ where: { userEmail: logInData.userEmail } });
@@ -53,6 +58,7 @@ class UserController {
     }
     initializeRoutes() {
         this.router.get(`/alluser`, this.allUsers);
+        this.router.put(`/edituser/:id`, this.editUser);
         this.router.post(`/login`, this.login);
         this.router.post(`/register`, this.register);
     }
