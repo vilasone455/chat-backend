@@ -18,7 +18,6 @@ class NoficationController implements Controller {
 
     private initializeRoutes() {
         this.router.get(`${this.path}`, authMiddleware , this.allNofication);
- 
     }
 
 

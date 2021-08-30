@@ -10,8 +10,21 @@ import UserController from "./controller/UserController";
 import FriendController from "./controller/FriendController";
 import GroupController from "./controller/GroupController";
 import NoficationController from "./controller/NoficationController";
+const Redis = require("ioredis");   
 
 createConnection().then(async connection => {
+    let url = process.env.REDIS_ENDPOINT_URI
+    const redis = new Redis(url);
+    console.log(url)
+
+    redis.get("foo", function (err, result) {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log(result); // Promise resolves to "bar"
+        }
+      });
+
     console.log("app running")
     const app = express();
 

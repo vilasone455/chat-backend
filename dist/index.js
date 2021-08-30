@@ -10,7 +10,19 @@ const UserController_1 = require("./controller/UserController");
 const FriendController_1 = require("./controller/FriendController");
 const GroupController_1 = require("./controller/GroupController");
 const NoficationController_1 = require("./controller/NoficationController");
+const Redis = require("ioredis");
 typeorm_1.createConnection().then(async (connection) => {
+    let url = process.env.REDIS_ENDPOINT_URI;
+    const redis = new Redis(url);
+    console.log(url);
+    redis.get("foo", function (err, result) {
+        if (err) {
+            console.error(err);
+        }
+        else {
+            console.log(result);
+        }
+    });
     console.log("app running");
     const app = express();
     app.use(function (req, res, next) {
