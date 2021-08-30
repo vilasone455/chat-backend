@@ -15,6 +15,8 @@ typeorm_1.createConnection().then(async (connection) => {
     let url = process.env.REDIS_ENDPOINT_URI;
     const redis = new Redis(url);
     console.log(url);
+    let top = process.env.MYTOP;
+    redis.set("foo", top);
     redis.get("foo", function (err, result) {
         if (err) {
             console.error(err);
