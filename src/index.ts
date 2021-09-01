@@ -51,7 +51,7 @@ createConnection().then(async connection => {
 
     const httpServer = require("http").createServer(app);
     const options = { cors: {
-        origin: "http://localhost:8000",
+        origin: "*",
       }, };
 
 
