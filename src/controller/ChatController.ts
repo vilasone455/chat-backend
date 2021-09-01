@@ -70,6 +70,8 @@ class ChatController implements Controller {
         const msgs = await this.chatRes.createQueryBuilder("c")
         .innerJoinAndSelect("c.conversation" , "conversation")
         .innerJoinAndSelect("c.sender" , "sender")
+        .leftJoinAndSelect("conversation.memberships" , "memberships")
+        .innerJoinAndSelect("memberships.user" , "user")
         .where("c.id IN (:...chatList)" , { chatList: msgId } )
         .getMany()
         
@@ -128,16 +130,25 @@ class ChatController implements Controller {
 
     private privateChat = async (request: RequestWithUser, response: Response, next: NextFunction) => {
         const userRes = getRepository(User)
-       
+        const memRes = getRepository(MemberShip)
         let targetId = request.params.id
         let target = await userRes.findOne(targetId)
         let user = request.user
         const conversationRes = getRepository(Conversation)
+
         let conver : Conversation = new Conversation()
         conver.title = ""
-        conver.members = [user , target]
-        const rs = await conversationRes.save(conver)
         
+        const rs = await conversationRes.save(conver)
+        let member1 = new MemberShip()
+        member1.user = user
+        member1.conversation = rs
+        let member2 = new MemberShip()
+        member2.user = target
+        member2.conversation = rs
+
+        await memRes.save([member1 , member2])
+
         response.send(rs)
     }
 

@@ -41,6 +41,8 @@ class ChatController {
             const msgs = await this.chatRes.createQueryBuilder("c")
                 .innerJoinAndSelect("c.conversation", "conversation")
                 .innerJoinAndSelect("c.sender", "sender")
+                .leftJoinAndSelect("conversation.memberships", "memberships")
+                .innerJoinAndSelect("memberships.user", "user")
                 .where("c.id IN (:...chatList)", { chatList: msgId })
                 .getMany();
             response.send({ val: msgs, user });
@@ -88,14 +90,21 @@ class ChatController {
         };
         this.privateChat = async (request, response, next) => {
             const userRes = typeorm_1.getRepository(User_1.User);
+            const memRes = typeorm_1.getRepository(MemberShip_1.MemberShip);
             let targetId = request.params.id;
             let target = await userRes.findOne(targetId);
             let user = request.user;
             const conversationRes = typeorm_1.getRepository(Conversation_1.Conversation);
             let conver = new Conversation_1.Conversation();
             conver.title = "";
-            conver.members = [user, target];
             const rs = await conversationRes.save(conver);
+            let member1 = new MemberShip_1.MemberShip();
+            member1.user = user;
+            member1.conversation = rs;
+            let member2 = new MemberShip_1.MemberShip();
+            member2.user = target;
+            member2.conversation = rs;
+            await memRes.save([member1, member2]);
             response.send(rs);
         };
         this.initializeRoutes();

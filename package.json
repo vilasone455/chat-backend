@@ -10,6 +10,8 @@
       "typescript": "3.3.3333"
    },
    "dependencies": {
+      "@socket.io/redis-adapter": "^7.0.0",
+      "@types/ioredis": "^4.27.1",
       "bcrypt": "^5.0.1",
       "body-parser": "^1.18.2",
       "dotenv": "^10.0.0",
